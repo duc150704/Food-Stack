@@ -260,7 +260,7 @@ GameObject:
   m_Component:
   - component: {fileID: 57905830}
   - component: {fileID: 57905829}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1143,7 +1143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1411854846}
   - component: {fileID: 1411854845}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1163,6 +1163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sceneCover: {fileID: 57905828}
+  _onGameStateChanged: {fileID: 11400000, guid: 8b33befc96196be4ca00d569698dfeba, type: 2}
 --- !u!4 &1411854846
 Transform:
   m_ObjectHideFlags: 0
@@ -1342,6 +1343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff8c9646695de842b460a1d3c1e73bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onGameStateChanged: {fileID: 11400000, guid: 8b33befc96196be4ca00d569698dfeba, type: 2}
   _musicSource: {fileID: 1015087083}
   _soundSource: {fileID: 942554326}
   _soundList:
@@ -1521,6 +1523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3623c3a408e807d4581d94c52aa3b58e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _onGameStateChanged: {fileID: 11400000, guid: 8b33befc96196be4ca00d569698dfeba, type: 2}
 --- !u!4 &1732580170
 Transform:
   m_ObjectHideFlags: 0

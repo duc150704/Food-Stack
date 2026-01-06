@@ -17,7 +17,7 @@ public enum EGameState
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public static event Action<EGameState> OnGameStateChanged;
+    [SerializeField] GameEvent<EGameState> _onGameStateChanged;
 
     EGameState _currentGameState = EGameState.None;
 
@@ -37,6 +37,6 @@ public class GameManager : MonoBehaviour
         if (_currentGameState == gameState)
             return;
         _currentGameState = gameState;
-        OnGameStateChanged?.Invoke(_currentGameState);
+        _onGameStateChanged?.Notify(_currentGameState);
     }
 }

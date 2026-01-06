@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     ISceneUI _currentUI;
 
     [SerializeField] GameObject _sceneCover;
+    [SerializeField] GameEvent<EGameState> _onGameStateChanged;
 
     private void Awake()
     {
@@ -29,9 +30,18 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _onGameStateChanged?.Register(OnChangedState);
+    }
+
+    private void OnDisable()
+    {
+        _onGameStateChanged?.Unregister(OnChangedState);
+    }
+
     private void Start()
     {
-        GameManager.OnGameStateChanged += OnChangedState;
         Invoke("Init", 0.2f);
     }
 

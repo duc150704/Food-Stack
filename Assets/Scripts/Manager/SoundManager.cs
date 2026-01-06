@@ -25,6 +25,8 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance;
 
+    [SerializeField] GameEvent<EGameState> _onGameStateChanged;
+
     [SerializeField] AudioSource _musicSource;
     [SerializeField] AudioSource _soundSource;
     [SerializeField] List<SoundData> _soundList = new List<SoundData>();
@@ -42,6 +44,16 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        _onGameStateChanged?.Register(OnGameStateChanged);
+    }
+
+    private void OnDisable()
+    {
+        _onGameStateChanged?.Unregister(OnGameStateChanged);
+    }
+
     private void Start()
     {
         foreach(var sound in _soundList)
@@ -50,8 +62,6 @@ public class SoundManager : MonoBehaviour
         }
         _musicSource.volume = 0.8f;
         _soundSource.volume = 0.8f;
-
-        GameManager.OnGameStateChanged += OnGameStateChanged;
     }
 
     void OnGameStateChanged(EGameState gameState)
