@@ -58,5 +58,6 @@ public class GameEvent<T> : ScriptableObject
     }
 }
 
+
 [CreateAssetMenu(fileName = "EGameStateEvent", menuName = "EGameState Event")]
 public class GameStateEvent : GameEvent<EGameState> { }

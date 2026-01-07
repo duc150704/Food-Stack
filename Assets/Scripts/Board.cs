@@ -6,104 +6,126 @@ using UnityEngine.UIElements;
 
 public class Board : MonoBehaviour
 {
-    [SerializeField] float _width;
-    [SerializeField] float _height;
-
     [SerializeField] Vector2 _offset = Vector2.zero;
+    [SerializeField] float _fallDownSpeed;
 
     [SerializeField] Sprite _bg1;
     [SerializeField] Sprite _bg2;
 
-    [SerializeField] GameObject _obj;
-    [SerializeField] GameEvent<EGameState> _onGameStateChanged;
-    List<Vector2> _foodPosition = new();
-    public List<Vector2> FoodPosition
-    {
-        get => _foodPosition;
-    }
+    float _verticalCenter;
+    float _horizontalCenter;
+    int _height;
+    int _width;
 
-    private void OnEnable()
-    {
-        _onGameStateChanged?.Register(OnGameStateChanged);
-    }
+    GameObject _food;
+    Food[,] _foods;
 
-    private void OnDisable()
+    private void Update()
     {
-        _onGameStateChanged?.Unregister(OnGameStateChanged);
-    }
-
-    void OnGameStateChanged(EGameState state)
-    {
-        switch (state)
+        if (InputManager.OnMouseRelease())
         {
-            case EGameState.Play:
-                InitBoard();
-                InitFood();
-                break;
+            FoodFall();
         }
     }
 
-    void InitFood()
+    public Vector2 CellPositionToWorldPosition(int x, int y)
     {
-        foreach (var item in _foodPosition)
+        return new Vector2(x - _horizontalCenter, y - _verticalCenter) + _offset;
+    }
+
+    public void InitBoard(int width, int height, GameObject food)
+    {
+        _foods = new Food[ width, height];
+        _height = height;
+        _width = width;
+        _food = food;
+
+        _horizontalCenter = (width * 1f - 1) / 2;
+        _verticalCenter = (height * 1f - 1) / 2;
+
+        Vector2 position = new Vector2(_horizontalCenter, _verticalCenter);
+        for (int i = 0; i < width; i++)
         {
-            Instantiate(_obj, item, Quaternion.identity);
+            for (int j = 0; j < height; j++)
+            {
+                GameObject go = new GameObject("Cell");
+                go.AddComponent<SpriteRenderer>();
+                go.GetComponent<SpriteRenderer>().sprite = (i + j) % 2 == 0 ? _bg1 : _bg2;
+                go.transform.position = new Vector2(i, j) - position + _offset;
+
+                go.transform.SetParent(this.transform);
+            }
         }
     }
-    void InitBoard()
-    {
-        float horizontalCenter = (_width - 1) / 2;
-        float verticalCenter = (_height - 1) / 2;
 
-        Vector2 position = new Vector2(horizontalCenter, verticalCenter);
+    public void InitFood()
+    {
         for (int i = 0; i < _width; i++)
         {
             for (int j = 0; j < _height; j++)
             {
-                if ((i + j) % 2 == 0)
+                if (_foods[i, j] == null)
                 {
-                    GameObject go = new GameObject("Cell");
-                    go.AddComponent<SpriteRenderer>();
-                    go.GetComponent<SpriteRenderer>().sprite = _bg1;
-                    go.transform.position = new Vector2(i, j) - position + _offset;
-
-                    _foodPosition.Add(new Vector2(go.transform.position.x, go.transform.position.y));
-                    go.transform.SetParent(this.transform);
-                }
-                else 
-                {
-                    GameObject go = new GameObject("Cell");
-                    go.AddComponent<SpriteRenderer>();
-                    go.GetComponent<SpriteRenderer>().sprite = _bg2;
-                    go.transform.position = new Vector2(i, j) - position + _offset;
-
-                    _foodPosition.Add(new Vector2(go.transform.position.x, go.transform.position.y));
-                    go.transform.SetParent(this.transform);
+                    CreateFood(i, j);
                 }
             }
         }
     }
 
-
-    private void OnDrawGizmosSelected()
+    void CreateFood(int i, int j)
     {
-        float horizontalCenter = (_width - 1) / 2;
-        float verticalCenter = (_height - 1) / 2;
+        GameObject food = Instantiate(_food, CellPositionToWorldPosition(i, j), Quaternion.identity);
+        _foods[i, j] = food.GetComponent<Food>();
+    }
 
-        Vector2 position = new Vector2(horizontalCenter, verticalCenter);
+    void FoodFall()
+    {
         for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < _height; j++)
+            for (int j = 0; j < _height; j++) // duyet qua bang
             {
-                if ((i + j) % 2 == 0)
+                if (_foods[i, j] == null) // neu food =[i, j] null, lay food[i, j +1] keo xuong;
                 {
-                    Gizmos.DrawSphere(new Vector2(i, j) - position + _offset, 0.1f);
-                }
-                else
-                {
-                    Gizmos.DrawSphere(new Vector2(i, j) - position + _offset, 0.1f);
+                    for (int newJ = j + 1; newJ < _height; newJ++)
+                    {
+                        if (_foods[i, newJ] != null)
+                        {
+                            _foods[i, newJ].FallDown(CellPositionToWorldPosition(i,j), _fallDownSpeed);
+                            _foods[i, j] = _foods[i, newJ];
+                            _foods[i, newJ] = null;
+                            break; 
+                        }
+                    }
+
+                    if(_foods[i, j] == null)
+                    {
+                        CreateFood(i, j);
+                    }
                 }
             }
         }
     }
 }
+
+
+    //private void OnDrawGizmosSelected()
+    //{
+    //    float horizontalCenter = (_width - 1) / 2;
+    //    float verticalCenter = (_height - 1) / 2;
+
+    //    Vector2 position = new Vector2(horizontalCenter, verticalCenter);
+    //    for (int i = 0; i < _width; i++)
+    //    {
+    //        for (int j = 0; j < _height; j++)
+    //        {
+    //            if ((i + j) % 2 == 0)
+    //            {
+    //                Gizmos.DrawSphere(new Vector2(i, j) - position + _offset, 0.1f);
+    //            }
+    //            else
+    //            {
+    //                Gizmos.DrawSphere(new Vector2(i, j) - position + _offset, 0.1f);
+    //            }
+    //        }
+    //    }
+    //}
